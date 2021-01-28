@@ -1,0 +1,9 @@
+
+*) IntegrationTest to validate out-of order is not messed up during rebalancing of kafka - WIP
+*) Use GoModules - Done
+*) Logging improvement - Done
+*) Metrics and instrumentation
+*) Packaging - Done
+*) Performance Testing - Done
+*) Documentation - Done
+

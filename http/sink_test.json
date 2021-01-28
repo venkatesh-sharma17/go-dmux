@@ -1,0 +1,9 @@
+{
+  "endpoint":"http://test-sink:8000",
+  "timeout":"10s",
+  "retry_interval":"100ms",
+  "headers": {
+    "X_CLIENT_ID": "go-dumx"
+  },
+  "sideline_after": 0
+}

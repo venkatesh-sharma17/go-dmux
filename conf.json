@@ -1,0 +1,52 @@
+{
+  "name": "myDmux",
+  "dmuxItems": [
+    {
+      "name": "sample_name",
+      "disabled": false,
+      "connectionType": "kafka_http",
+      "connection": {
+        "dmux": {
+          "size": 250,
+          "distributor_type": "Hash",
+          "batch_size": 1
+        },
+        "source": {
+          "name": "source_name",
+          "zk_path": "zookeeper1:2181,zookeeper2:2181,zookeeper3:2181/zk-path",
+          "kafka_version_major": 2,
+          "topic": "source_topic",
+          "force_restart": false,
+          "read_newest": true
+        },
+        "pending_acks": 1000000,
+        "sink": {
+          "endpoint": "http://elb/1.0/api/consume",
+          "timeout": "10s",
+          "retry_interval": "100ms",
+          "headers": [
+            {
+              "name": "X-Client",
+              "value": "go-dumx"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST"
+        }
+      }
+    }
+  ],
+  "logging": {
+    "path": "default.log",
+    "enable_debug": false,
+    "rotation": {
+      "size_in_mb": 256,
+      "retention_count": 5,
+      "retention_days": 90,
+      "compress": true
+    }
+  }
+}

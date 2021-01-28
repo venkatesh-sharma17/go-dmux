@@ -1,0 +1,25 @@
+site_name: go-dmux
+repo_name: 'flipkart-incubator/go-dmux'
+repo_url: https://github.com/flipkart-incubator/go-dmux
+edit_uri: blob/master/docs/
+theme:
+  name: material
+  font:
+    text: 'Ubuntu'
+    code: 'Ubuntu Mono'
+  logo:
+    icon: 'wb_cloudy'
+  favicon: 'favicon.png'
+
+markdown_extensions:
+  - admonition              # For note/tip sections
+  - footnotes
+  - pymdownx.tasklist       # Github like task lsits
+  - pymdownx.mark           # Highlight text
+  - pymdownx.superfences    # Code blocks within sections
+  - pymdownx.emoji          # Emoji using shorthands
+  - toc:
+      permalink: true
+extra:
+  search:
+    language: 'en'
