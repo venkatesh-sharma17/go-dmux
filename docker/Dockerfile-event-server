@@ -1,0 +1,4 @@
+from python:3
+WORKDIR /usr/src/app
+COPY docker/server.py .
+CMD [ "python", "/usr/src/app/server.py", "8888" ]
