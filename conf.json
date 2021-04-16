@@ -1,5 +1,6 @@
 {
   "name": "myDmux",
+  "dmuxLogEnableDebug": true,
   "dmuxItems": [
     {
       "name": "sample_name",
