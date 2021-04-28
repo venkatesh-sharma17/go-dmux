@@ -7,4 +7,5 @@ mkdir -p  /var/log/flipkart/go-dmux
 #  mkdir -p ${LOG_DIR}
 #fi
 sleep 10
-/app/go-dmux /app/config/conf.json
+# arguments for the app will be passed at runtime
+exec /app/go-dmux "$@"
