@@ -26,7 +26,6 @@ RUN apt-get clean \
 WORKDIR /app
 
 COPY --from=build /app/bin/go-dmux .
-COPY --from=build /app/docker/config/conf.json config/conf.json
 COPY --from=build /app/docker/entrypoint.sh .
 
 ENV PROJECT "go-dmux"
