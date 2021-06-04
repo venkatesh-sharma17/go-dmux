@@ -5,6 +5,9 @@ services:
     build:
       context: ./..
       dockerfile: docker/Dockerfile
+    volumes:
+      - ${PWD}/config/conf.json:/etc/go-dmux/config.json
+    command: ["/etc/go-dmux/config.json"]
     ports:
       - "1234:1234"
     depends_on:

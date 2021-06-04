@@ -1,6 +1,0 @@
-FROM docker_go-dmux
-WORKDIR /app
-COPY docker/entrypoint.sh .
-
-ENTRYPOINT [ "/app/entrypoint.sh" ]
-
