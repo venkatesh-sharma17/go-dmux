@@ -15,6 +15,11 @@ RUN go build -o bin/go-dmux
 
 FROM golang:1.12-stretch as deploy
 
+ENV user "go-dmux"
+ENV group "go-dmux"
+ENV UID 3119
+ENV GID 3000
+
 RUN apt-get update && \
     apt-get install -y procps && \
     apt-get install -y ngrep && \
@@ -26,22 +31,15 @@ RUN apt-get clean \
 WORKDIR /app
 
 COPY --from=build /app/bin/go-dmux .
-COPY --from=build /app/docker/entrypoint.sh .
-
-ENV PROJECT "go-dmux"
-ENV UID 3119
-ENV GID 3000
-ENV user "go-dmux"
-ENV group "go-dmux"
 
 RUN groupadd -g ${GID} ${group} && \
-    useradd -ms /bin/bash --create-home -g ${GID} -u ${UID} ${user}
-
-RUN chown -R ${user}:${group} /var/log && \
-    chmod 777 entrypoint.sh && \
+    useradd -ms /bin/bash --create-home -g ${GID} -u ${UID} ${user} ; \
+    mkdir -p /var/log/go-dmux ; \
+    chown -R ${user}:${group} /var/log/go-dmux ; \
     chmod 777 go-dmux
 
 USER ${user}
 
-ENTRYPOINT [ "/app/entrypoint.sh" ]
+ENTRYPOINT [ "./go-dmux" ]
+CMD ["/var/log/go-dmux"]
 
