@@ -41,7 +41,7 @@
     }
   ],
   "logging": {
-    "path": "default.log",
+    "path": "/var/log/go-dmux/default.log",
     "enable_debug": true,
     "rotation": {
       "size_in_mb": 256,

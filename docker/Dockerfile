@@ -40,6 +40,4 @@ RUN groupadd -g ${GID} ${group} && \
 
 USER ${user}
 
-ENTRYPOINT [ "./go-dmux" ]
-CMD ["/var/log/go-dmux"]
-
+ENTRYPOINT ["./go-dmux"]
