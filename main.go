@@ -37,7 +37,7 @@ func main() {
 	for _, item := range conf.DMuxItems {
 		go func(connType ConnectionType, connConf interface{}, logDebug bool) {
 			connType.Start(connConf, logDebug)
-		}(item.ConnType, item.Connection, conf.Logging.EnableDebug)
+		}(item.ConnType, item.Connection, dmuxLogging.EnableDebug)
 	}
 
 	//main thread halts. TODO make changes to listen to kill and reboot

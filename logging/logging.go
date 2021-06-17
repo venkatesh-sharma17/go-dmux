@@ -1,13 +1,32 @@
 package logging
 
 import (
+	"encoding/json"
 	"log"
+	"os"
 
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
+//AppenderType identifies nature of logs
+type AppenderType string
+
+const (
+	Console AppenderType = "console"
+	File AppenderType = "file"
+)
+
 //LogConf holds logging configuration
 type LogConf struct {
+	Type   AppenderType `json:"type"`
+	Config interface{}  `json:"config"`
+}
+
+type ConsoleBasedConf struct {
+	EnableDebug bool       `json:"enable_debug"`
+}
+
+type FileBasedConf struct {
 	Path        string     `json:"path"`
 	EnableDebug bool       `json:"enable_debug"`
 	Rotate      RotateConf `json:"rotation"`
@@ -22,15 +41,33 @@ type RotateConf struct {
 }
 
 //DMuxLogging logging
-type DMuxLogging struct{}
+type DMuxLogging struct{
+	EnableDebug bool
+}
 
 //Start starting logging
-func (c *DMuxLogging) Start(logconf LogConf) {
-	log.SetOutput(&lumberjack.Logger{
-		Filename:   logconf.Path,
-		MaxSize:    logconf.Rotate.FileSize, // megabytes
-		MaxBackups: logconf.Rotate.NoOfFiles,
-		MaxAge:     logconf.Rotate.RotationDays, //days
-		Compress:   logconf.Rotate.Compress,     // disabled by default
-	})
+func (c *DMuxLogging) Start(logConf LogConf) {
+	switch logConf.Type {
+	case Console:
+		// handling for console
+		log.SetOutput(os.Stdout)
+		data, _ := json.Marshal(logConf.Config)
+		var config *ConsoleBasedConf
+		json.Unmarshal(data, &config)
+		c.EnableDebug = config.EnableDebug
+	case File:
+		data, _ := json.Marshal(logConf.Config)
+		var config *FileBasedConf
+		json.Unmarshal(data, &config)
+		log.SetOutput(&lumberjack.Logger{
+			Filename:   config.Path,
+			MaxSize:    config.Rotate.FileSize, // megabytes
+			MaxBackups: config.Rotate.NoOfFiles,
+			MaxAge:     config.Rotate.RotationDays, //days
+			Compress:   config.Rotate.Compress,     // disabled by default
+		})
+		c.EnableDebug = config.EnableDebug
+	default:
+		panic("Invalid logger type")
+	}
 }

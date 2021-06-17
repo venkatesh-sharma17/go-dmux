@@ -40,13 +40,6 @@
     }
   ],
   "logging": {
-    "path": "/var/log/go-dmux/default.log",
-    "enable_debug": true,
-    "rotation": {
-      "size_in_mb": 256,
-      "retention_count": 5,
-      "retention_days": 90,
-      "compress": true
-    }
+    "type": "console"
   }
 }
