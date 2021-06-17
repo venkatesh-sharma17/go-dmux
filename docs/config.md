@@ -52,13 +52,16 @@ Sample config file which which DMux will reading during start-up
     }
   ],
   "logging": {
-    "path": "default.log",
-    "enable_debug": false,
-    "rotation": {
-      "size_in_mb": 256,
-      "retention_count": 5,
-      "retention_days": 90,
-      "compress": true
+    "type": "file",
+    "config": {
+      "path": "default.log",
+      "enable_debug": false,
+      "rotation": {
+        "size_in_mb": 256,
+        "retention_count": 5,
+        "retention_days": 90,
+        "compress": true
+      }
     }
   }
 }
@@ -83,12 +86,25 @@ Sample config file which which DMux will reading during start-up
 | sink.retry_interval| 100ms     | time interval to sleep before retry if http call failed. Note: go-dmux has no concept of sideline, It will do infinite retries. Client is expected to build sideline if need at the Sink  Application being hit|
 | sink.headers| NA  | static headers to be added in http call. Note:  Content-Type:application/octet-stream will be added for POST calls for kafka_http  and application/json for kafka_foxtrot|
 | pending_acks| 10000     | No of unordered acks acceptable till go-dmux starts to apply backpressure to the source. Increase this if QPS does not increase on increasing size and you can see Warning Log in go-dmux that you hit this threshold. Cost of increasing this is memory and larger no of records replay when go-dmux crashes.|
-| logging.path| /var/log/go-dmux/default.log     | log file path|
-| dmuxLogEnableDebug| false    | boolean flag to enable debug logging|
-| logging.rotation.size_in_mb| 256     | log size|
-| logging.rotation.retention_count| 5     | number of log files to keep, rest are archived |
-| logging.rotation.retention_days| 90     | number of days to keep log files, rest are archive. |
-| logging.rotation.compress| true     | will compress log files which are rotated|
+| logging.type| NA | can be either `console` or `file`, decides whether log should be written to console or file |
+| logging.config| NA | configuration for `console` or `file` logger |
+
+##### Log config
+
+###### Type: console
+| Config Key       | Default | Comment        |
+| ------------- |:-------------|:-------------|
+| logging.config.enable_debug| false    | boolean flag to enable debug logging|
+
+###### Type: file
+| Config Key       | Default | Comment        |
+| ------------- |:-------------|:-------------|
+| logging.config.path| /var/log/go-dmux/default.log     | log file path|
+| logging.config.enable_debug| false    | boolean flag to enable debug logging|
+| logging.config.rotation.size_in_mb| 256     | log size|
+| logging.config.rotation.retention_count| 5     | number of log files to keep, rest are archived |
+| logging.config.rotation.retention_days| 90     | number of days to keep log files, rest are archive. |
+| logging.config.rotation.compress| true     | will compress log files which are rotated|
 
 
 **Note** which every condition becomes true first in retention_count and retention_days will apply.
