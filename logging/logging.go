@@ -42,7 +42,7 @@ type RotateConf struct {
 
 //DMuxLogging logging
 type DMuxLogging struct{
-	EnableDebug bool
+	EnableDebug bool `json:"enable_debug"`
 }
 
 //Start starting logging
