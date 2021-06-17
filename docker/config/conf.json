@@ -40,6 +40,9 @@
     }
   ],
   "logging": {
-    "type": "console"
+    "type": "console",
+    "config": {
+      "enable_debug": true
+    }
   }
 }
