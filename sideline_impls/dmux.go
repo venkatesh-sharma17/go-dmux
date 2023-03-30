@@ -1,27 +1,19 @@
-package main
+package sideline_impls
 
 import (
 	co "github.com/flipkart-incubator/go-dmux/config"
+	"github.com/flipkart-incubator/go-dmux/logging"
 	"github.com/flipkart-incubator/go-dmux/metrics"
 	"log"
-	"os"
-
-	"github.com/flipkart-incubator/go-dmux/logging"
 )
 
 //
 
-// **************** Bootstrap ***********
+type DmuxCustom struct {
+}
 
-func main() {
-	args := os.Args[1:]
-	sz := len(args)
-
-	var path string
-
-	if sz == 1 {
-		path = args[0]
-	}
+func (d *DmuxCustom) DmuxStart(path string, sidelineImp interface{}) {
+	//log.Println(checkMessageSideline.SidelineMessage())
 
 	dconf := co.DMuxConfigSetting{
 		FilePath: path,
@@ -29,7 +21,7 @@ func main() {
 	conf := dconf.GetDmuxConf()
 
 	dmuxLogging := new(logging.DMuxLogging)
-	dmuxLogging.Start(conf.Logging)
+	//_ = new(logging.DMuxLogging)
 
 	log.Printf("config: %v", conf)
 
@@ -37,8 +29,9 @@ func main() {
 	metrics.Start(conf.MetricPort)
 
 	for _, item := range conf.DMuxItems {
+		log.Println(item.ConnType)
 		go func(connType co.ConnectionType, connConf interface{}, logDebug bool) {
-			connType.Start(connConf, logDebug, nil)
+			connType.Start(connConf, logDebug, sidelineImp)
 		}(item.ConnType, item.Connection, dmuxLogging.EnableDebug)
 	}
 

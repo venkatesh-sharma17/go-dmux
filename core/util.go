@@ -116,3 +116,5 @@ func Contains(a []int, x int) bool {
 	}
 	return false
 }
+
+const SidelineMessage string = "sidelining the message"

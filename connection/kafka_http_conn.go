@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/flipkart-incubator/go-dmux/offset_monitor"
+	sideline_models "github.com/flipkart-incubator/go-dmux/sideline"
 	"hash/fnv"
 	"log"
 	"os"
@@ -31,6 +32,7 @@ type KafkaHTTPConnConfig struct {
 type KafkaHTTPConn struct {
 	EnableDebugLog bool
 	Conf           interface{}
+	SidelineImpl   interface{}
 }
 
 func (c *KafkaHTTPConn) getConfiguration() *KafkaHTTPConnConfig {
@@ -64,7 +66,11 @@ func (c *KafkaHTTPConn) Run() {
 	d := core.GetDistribution(conf.Dmux.DistributorType, h)
 
 	dmux := core.GetDmux(conf.Dmux, d)
-	dmux.Connect(src, sk)
+	if c.SidelineImpl != nil {
+		dmux.ConnectWithSideline(src, sk, c.SidelineImpl.(sideline_models.CheckMessageSideline))
+	} else {
+		dmux.ConnectWithSideline(src, sk, nil)
+	}
 	dmux.Join()
 }
 

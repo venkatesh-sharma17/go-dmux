@@ -70,6 +70,22 @@ func (k *KafkaSource) RegisterHook(hook KafkaSourceHook) {
 // 	k.Processed = true
 // }
 
+func (k *KafkaSource) GetKey(msg interface{}) []byte {
+	return msg.(KafkaMsg).GetRawMsg().Key
+}
+
+func (k *KafkaSource) GetPartition(msg interface{}) int32 {
+	return msg.(KafkaMsg).GetRawMsg().Partition
+}
+
+func (k *KafkaSource) GetValue(msg interface{}) []byte {
+	return msg.(KafkaMsg).GetRawMsg().Value
+}
+
+func (k *KafkaSource) GetOffset(msg interface{}) int64 {
+	return msg.(KafkaMsg).GetRawMsg().Offset
+}
+
 //Generate is Source method implementation, which connect to Kafka and pushes
 //KafkaMessage into the channel
 func (k *KafkaSource) Generate(out chan<- interface{}) {
