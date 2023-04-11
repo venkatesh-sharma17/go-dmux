@@ -30,9 +30,15 @@ func (d *DmuxCustom) DmuxStart(path string, sidelineImp interface{}) {
 
 	for _, item := range conf.DMuxItems {
 		log.Println(item.ConnType)
-		go func(connType co.ConnectionType, connConf interface{}, logDebug bool) {
-			connType.Start(connConf, logDebug, sidelineImp)
-		}(item.ConnType, item.Connection, dmuxLogging.EnableDebug)
+		if item.SidelineEnable {
+			go func(connType co.ConnectionType, connConf interface{}, logDebug bool) {
+				connType.Start(connConf, logDebug, sidelineImp)
+			}(item.ConnType, item.Connection, dmuxLogging.EnableDebug)
+		} else {
+			go func(connType co.ConnectionType, connConf interface{}, logDebug bool) {
+				connType.Start(connConf, logDebug, nil)
+			}(item.ConnType, item.Connection, dmuxLogging.EnableDebug)
+		}
 	}
 
 	//main thread halts. TODO make changes to listen to kill and reboot

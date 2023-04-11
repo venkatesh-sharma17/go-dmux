@@ -87,10 +87,11 @@ type DmuxConf struct {
 
 //DmuxItem struct defines name and type of connection
 type DmuxItem struct {
-	Name       string         `json:"name"`
-	Disabled   bool           `json:"disabled`
-	ConnType   ConnectionType `json:"connectionType"`
-	Connection interface{}    `json:connection`
+	Name           string         `json:"name"`
+	Disabled       bool           `json:"disabled`
+	ConnType       ConnectionType `json:"connectionType"`
+	Connection     interface{}    `json:connection`
+	SidelineEnable bool           `json:"sidelineEnable"`
 }
 
 //GetDmuxConf parses Config file and return DmuxConf
