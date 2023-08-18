@@ -16,14 +16,14 @@ import (
 	core "github.com/flipkart-incubator/go-dmux/core"
 )
 
-//HTTPSink is Sink implementation which writes to HttpEndpoint
+// HTTPSink is Sink implementation which writes to HttpEndpoint
 type HTTPSink struct {
 	client *http.Client
 	hook   HTTPSinkHook
 	conf   HTTPSinkConf
 }
 
-//HTTPSinkConf  holds config to HTTPSink
+// HTTPSinkConf  holds config to HTTPSink
 type HTTPSinkConf struct {
 	Endpoint                    string              `json:"endpoint"` //http://destinationHost:port/prefixPath
 	Timeout                     core.Duration       `json:"timeout"`
@@ -34,7 +34,7 @@ type HTTPSinkConf struct {
 
 }
 
-//HTTPSinkHook is added for Clien to attach pre and post porcessing logic
+// HTTPSinkHook is added for Clien to attach pre and post porcessing logic
 type HTTPSinkHook interface {
 	PreHTTPCall(msg interface{})
 	PostHTTPCall(msg interface{}, sucess bool)
@@ -73,7 +73,7 @@ func getClientTimeout(conf HTTPSinkConf) time.Duration {
 	return conf.Timeout.Duration
 }
 
-//GetHTTPSink method is public method used to create Instance of HTTPSink
+// GetHTTPSink method is public method used to create Instance of HTTPSink
 func GetHTTPSink(size int, conf HTTPSinkConf) *HTTPSink {
 
 	client := &http.Client{
@@ -93,8 +93,8 @@ func (h *HTTPSink) RegisterHook(hook HTTPSinkHook) {
 	h.hook = hook
 }
 
-//HTTPMsg is an interface which incoming data should implment for HttpSink to
-//work
+// HTTPMsg is an interface which incoming data should implment for HttpSink to
+// work
 type HTTPMsg interface {
 	GetPayload() []byte
 
@@ -107,13 +107,13 @@ type HTTPMsg interface {
 	BatchPayload(msgs []interface{}, version int) []byte
 }
 
-//Clone is implementation of Sink interface method. As HTTPSink is Stateless
-//this method returns selfRefrence
+// Clone is implementation of Sink interface method. As HTTPSink is Stateless
+// this method returns selfRefrence
 func (h *HTTPSink) Clone() core.Sink {
 	return h
 }
 
-//BatchConsume is implementation of Sink interface Consume.
+// BatchConsume is implementation of Sink interface Consume.
 func (h *HTTPSink) BatchConsume(msgs []interface{}, version int) {
 	// fmt.Println(msgs)
 	batchHelper := msgs[0].(HTTPMsg) // empty refrence to help call static methods
@@ -143,9 +143,9 @@ func (h *HTTPSink) BatchConsume(msgs []interface{}, version int) {
 
 }
 
-//Consume is implementation for Single message Consumption.
-//This infinitely retries pre and post hooks, but finetly retries HTTPCall
-//for status. status == true is determined by responseCode 2xx
+// Consume is implementation for Single message Consumption.
+// This infinitely retries pre and post hooks, but finetly retries HTTPCall
+// for status. status == true is determined by responseCode 2xx
 func (h *HTTPSink) Consume(msg interface{}, retries int, sidelineResponseCodes []int) error {
 
 	data := msg.(HTTPMsg)
@@ -169,6 +169,8 @@ func (h *HTTPSink) Consume(msg interface{}, retries int, sidelineResponseCodes [
 func (h *HTTPSink) retryPre(msg interface{}, url string) {
 	for {
 		status := h.pre(h.hook, msg, url)
+		log.Print("url is " + url + "  status is " + strconv.FormatBool(status))
+
 		if status {
 			break
 		}

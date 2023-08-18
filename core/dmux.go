@@ -27,7 +27,7 @@ const (
 	Failed uint8 = 2
 )
 
-//DmuxConf holds configuration parameters for Dmux
+// DmuxConf holds configuration parameters for Dmux
 type DmuxConf struct {
 	Size            int             `json:"size"`
 	SourceQSize     int             `json:"source_queue_size"`
@@ -38,7 +38,7 @@ type DmuxConf struct {
 	Sideline        Sideline        `json:"sideline"`
 }
 
-//Sideline holds config parameters for sideline
+// Sideline holds config parameters for sideline
 type Sideline struct {
 	Retries               int         `json:"retries"`
 	SidelineResponseCodes []int       `json:"sidelineResponseCodes"`
@@ -55,19 +55,19 @@ type ControlMsg struct {
 	meta   interface{}
 }
 
-//ResizeMeta is the struct used to define resize value which is used when
+// ResizeMeta is the struct used to define resize value which is used when
 // Dmux is resizing
 type ResizeMeta struct {
 	newSize int
 }
 
-//ResponseMsg is used for running Dmux instnace to response to client
+// ResponseMsg is used for running Dmux instnace to response to client
 type ResponseMsg struct {
 	signal ControlSignal
 	status uint8
 }
 
-//Sink is interface that implements OutputSink of Dmux operation
+// Sink is interface that implements OutputSink of Dmux operation
 type Sink interface {
 	// Clone method is expected to return instance of Sink. If Sink is Stateless
 	// this can return selfRefrence back. If Sink is Stateful, its good idea to
@@ -83,7 +83,7 @@ type Sink interface {
 	BatchConsume(msg []interface{}, version int)
 }
 
-//Source is interface that implements input Source to the Dmux
+// Source is interface that implements input Source to the Dmux
 type Source interface {
 	//Generate method takes output channel to which it writes data. The
 	//implementation can write to to this using multiple goroutines
@@ -101,18 +101,18 @@ type Source interface {
 	GetOffset(msg interface{}) int64
 }
 
-//Distributor interface abstracts the Logic to distribute the load from Source
+// Distributor interface abstracts the Logic to distribute the load from Source
 // to Sink. Client can choose to use HashDistributor or RoundRobinDistributor or
-//write their own distribution Logic
+// write their own distribution Logic
 type Distributor interface {
 	//Distribute method take incoming data interface and number of outbound channels
 	//to return the index of channel to be selected for Distribution of this message
 	Distribute(data interface{}, size int) int
 }
 
-//Dmux struct which enables Size based Dmultiplexing for
-//Source to Sink connections.
-//TODO restrict size to be powers of 2 for better optimization in modulo
+// Dmux struct which enables Size based Dmultiplexing for
+// Source to Sink connections.
+// TODO restrict size to be powers of 2 for better optimization in modulo
 type Dmux struct {
 	size                   int
 	batchSize              int
@@ -130,7 +130,7 @@ const defaultSinkQSize int = 100
 const defaultBatchSize int = 1
 const defaultVersion int = 1
 
-//GetDmux is public method used to Get instance of a Dmux struct
+// GetDmux is public method used to Get instance of a Dmux struct
 func GetDmux(conf DmuxConf, d Distributor) *Dmux {
 	control := make(chan ControlMsg)
 	response := make(chan ResponseMsg)
@@ -166,12 +166,12 @@ func GetDmux(conf DmuxConf, d Distributor) *Dmux {
 	go d.run(source, sink)
 }*/
 
-//Connect method holds Dmux logic used to Connect Source to Sink With Sideline
-func (d *Dmux) ConnectWithSideline(source Source, sink Sink, sidelineImpl sideline_module.CheckMessageSideline) {
-	go d.runWithSideline(source, sink, sidelineImpl)
+// Connect method holds Dmux logic used to Connect Source to Sink With Sideline
+func (d *Dmux) ConnectWithSideline(source Source, sink Sink, sidelineImpl sideline_module.CheckMessageSideline, enableDebugLog bool) {
+	go d.runWithSideline(source, sink, sidelineImpl, enableDebugLog)
 }
 
-//Await method added to enable testing when using bounded source
+// Await method added to enable testing when using bounded source
 func (d *Dmux) Await(duration time.Duration) {
 
 	select {
@@ -185,7 +185,7 @@ func (d *Dmux) Await(duration time.Duration) {
 
 }
 
-//Join used to sleep the main routine forever
+// Join used to sleep the main routine forever
 func (d *Dmux) Join() {
 	e := <-d.err
 	if e != nil {
@@ -193,7 +193,7 @@ func (d *Dmux) Join() {
 	}
 }
 
-//Resize method is used to Resize a running Dmux
+// Resize method is used to Resize a running Dmux
 func (d *Dmux) Resize(size int) {
 	d.control <- getResizeMsg(size)
 	<-d.response
@@ -220,7 +220,7 @@ func getStopMsg() ControlMsg {
 	return c
 }
 
-func (d *Dmux) runWithSideline(source Source, sink Sink, sidelineImpl sideline_module.CheckMessageSideline) {
+func (d *Dmux) runWithSideline(source Source, sink Sink, sidelineImpl sideline_module.CheckMessageSideline, enableDebugLog bool) {
 
 	ch, wg := setupWithSideline(d.size, d.sinkQSize, d.batchSize, sink, source, d.version, d.sideline, sidelineImpl)
 	in := make(chan interface{}, d.sourceQSize)
@@ -233,6 +233,9 @@ func (d *Dmux) runWithSideline(source Source, sink Sink, sidelineImpl sideline_m
 		case data := <-in:
 			i := d.distribute.Distribute(data, len(ch))
 			// log.Printf("writing to channel %d len %d", i, len(ch[i]))
+			if enableDebugLog {
+				log.Printf("writing to channel %d len %d", i, len(ch[i]))
+			}
 			ch[i] <- data
 		case ctrl := <-d.control:
 			if ctrl.signal == Resize {
@@ -261,13 +264,14 @@ func shutdown(ch []chan interface{}, wg *sync.WaitGroup) {
 	wg.Wait()
 }
 
-/*func setup(size, qsize, batchSize int, sink Sink, version int) ([]chan interface{}, *sync.WaitGroup) {
-	if version == 1 && batchSize == 1 {
-		return setupWithSideline(size, qsize, batchSize, sink, version, nil, nil)
-	} else {
-		return batchSetup(size, qsize, batchSize, sink, version)
+/*
+	func setup(size, qsize, batchSize int, sink Sink, version int) ([]chan interface{}, *sync.WaitGroup) {
+		if version == 1 && batchSize == 1 {
+			return setupWithSideline(size, qsize, batchSize, sink, version, nil, nil)
+		} else {
+			return batchSetup(size, qsize, batchSize, sink, version)
+		}
 	}
-}
 */
 func setupWithSideline(size, qsize, batchSize int, sink Sink, source Source, version int, sideline Sideline, sidelineImpl sideline_module.CheckMessageSideline) ([]chan interface{}, *sync.WaitGroup) {
 	if version == 1 && batchSize == 1 {

@@ -11,7 +11,7 @@ import (
 	"github.com/flipkart-incubator/go-dmux/logging"
 )
 
-//ConnectionType based on this type of Connection and related forks happen
+// ConnectionType based on this type of Connection and related forks happen
 type ConnectionType string
 
 const (
@@ -19,6 +19,9 @@ const (
 	KafkaHTTP ConnectionType = "kafka_http"
 	//KafkaFoxtrot key to define kafka to foxtrot http sink
 	KafkaFoxtrot ConnectionType = "kafka_foxtrot"
+
+	//PulsarHTTP key to define pulsar to generic http sink
+	PulsarHTTP ConnectionType = "pulsar_http"
 )
 
 func (c ConnectionType) getConfig(data []byte) interface{} {
@@ -31,13 +34,17 @@ func (c ConnectionType) getConfig(data []byte) interface{} {
 		var connConf []*connection.KafkaFoxtrotConnConfig
 		json.Unmarshal(data, &connConf)
 		return connConf[0]
+	case PulsarHTTP:
+		var connConf []*connection.PulsarConnConfig
+		json.Unmarshal(data, &connConf)
+		return connConf[0]
 	default:
 		panic("Invalid Connection Type")
 
 	}
 }
 
-//Start invokes Run of the respective connection in a go routine
+// Start invokes Run of the respective connection in a go routine
 func (c ConnectionType) Start(conf interface{}, enableDebug bool, sidelineImpl interface{}) {
 	switch c {
 	case KafkaHTTP:
@@ -65,18 +72,25 @@ func (c ConnectionType) Start(conf interface{}, enableDebug bool, sidelineImpl i
 		}
 		log.Println("Starting ", KafkaFoxtrot)
 		connObj.Run()
+	case PulsarHTTP:
+		connObj := &connection.PulsarConn{
+			EnableDebugLog: enableDebug,
+			Conf:           conf,
+		}
+		log.Println("Starting ", PulsarHTTP)
+		connObj.Run()
 	default:
 		panic("Invalid Connection Type")
 	}
 
 }
 
-//DMuxConfigSetting dumx obj
+// DMuxConfigSetting dumx obj
 type DMuxConfigSetting struct {
 	FilePath string
 }
 
-//DmuxConf hold Config data
+// DmuxConf hold Config data
 type DmuxConf struct {
 	Name      string     `json:"name"`
 	DMuxItems []DmuxItem `json:"dmuxItems"`
@@ -85,7 +99,7 @@ type DmuxConf struct {
 	Logging    logging.LogConf `json:"logging"`
 }
 
-//DmuxItem struct defines name and type of connection
+// DmuxItem struct defines name and type of connection
 type DmuxItem struct {
 	Name           string         `json:"name"`
 	Disabled       bool           `json:"disabled`
@@ -94,7 +108,7 @@ type DmuxItem struct {
 	SidelineEnable bool           `json:"sidelineEnable"`
 }
 
-//GetDmuxConf parses Config file and return DmuxConf
+// GetDmuxConf parses Config file and return DmuxConf
 func (s DMuxConfigSetting) GetDmuxConf() DmuxConf {
 	raw, err := ioutil.ReadFile(s.FilePath)
 	if err != nil {

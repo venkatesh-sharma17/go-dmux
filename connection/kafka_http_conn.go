@@ -19,7 +19,7 @@ import (
 
 // **************** CONFIG ***********
 
-//KafkaHTTPConnConfig holds config to connect KafkaSource to http_sink
+// KafkaHTTPConnConfig holds config to connect KafkaSource to http_sink
 type KafkaHTTPConnConfig struct {
 	Dmux          core.DmuxConf                 `json:"dmux"`
 	Source        source.KafkaConf              `json:"source"`
@@ -28,7 +28,7 @@ type KafkaHTTPConnConfig struct {
 	OffsetMonitor offset_monitor.OffMonitorConf `json:"offset_monitor"`
 }
 
-//KafkaHTTPConn struct to abstract this connections Run
+// KafkaHTTPConn struct to abstract this connections Run
 type KafkaHTTPConn struct {
 	EnableDebugLog bool
 	Conf           interface{}
@@ -42,7 +42,7 @@ func (c *KafkaHTTPConn) getConfiguration() *KafkaHTTPConnConfig {
 	return config
 }
 
-//Run method to start this Connection from source to sink
+// Run method to start this Connection from source to sink
 func (c *KafkaHTTPConn) Run() {
 	conf := c.getConfiguration()
 	fmt.Println("starting go-dmux with conf", conf)
@@ -67,9 +67,9 @@ func (c *KafkaHTTPConn) Run() {
 
 	dmux := core.GetDmux(conf.Dmux, d)
 	if c.SidelineImpl != nil {
-		dmux.ConnectWithSideline(src, sk, c.SidelineImpl.(sideline_models.CheckMessageSideline))
+		dmux.ConnectWithSideline(src, sk, c.SidelineImpl.(sideline_models.CheckMessageSideline), c.EnableDebugLog)
 	} else {
-		dmux.ConnectWithSideline(src, sk, nil)
+		dmux.ConnectWithSideline(src, sk, nil, c.EnableDebugLog)
 	}
 	dmux.Join()
 }
@@ -90,7 +90,7 @@ func parseConf(path string) KafkaHTTPConnConfig {
 */
 //******************KafkaSource Interface implementation ******
 
-//KafkaMessage is data attribute that will be passed from Source to Sink
+// KafkaMessage is data attribute that will be passed from Source to Sink
 type KafkaMessage struct {
 	Msg       *sarama.ConsumerMessage
 	Processed bool   //marker to know once this message has been processed by Sink
@@ -105,7 +105,7 @@ func getKafkaHTTPFactory() source.KafkaMsgFactory {
 type kafkaHTTPFactoryImpl struct {
 }
 
-//Create KafkaMessage which implments KafkaMsg and HTTPMsg and wraps sarama.ConsumerMessage
+// Create KafkaMessage which implments KafkaMsg and HTTPMsg and wraps sarama.ConsumerMessage
 func (*kafkaHTTPFactoryImpl) Create(msg *sarama.ConsumerMessage) source.KafkaMsg {
 	return &KafkaMessage{
 		Msg:       msg,
@@ -113,17 +113,17 @@ func (*kafkaHTTPFactoryImpl) Create(msg *sarama.ConsumerMessage) source.KafkaMsg
 	}
 }
 
-//MarkDone the  KafkaMessage as processed
+// MarkDone the  KafkaMessage as processed
 func (k *KafkaMessage) MarkDone() {
 	k.Processed = true
 }
 
-//GetRawMsg returns saram.ConsumerMessage under KafkaMessage
+// GetRawMsg returns saram.ConsumerMessage under KafkaMessage
 func (k *KafkaMessage) GetRawMsg() *sarama.ConsumerMessage {
 	return k.Msg
 }
 
-//IsProcessed returns true if KafkaMessage was MarkDone
+// IsProcessed returns true if KafkaMessage was MarkDone
 func (k *KafkaMessage) IsProcessed() bool {
 	return k.Processed
 }
@@ -132,15 +132,15 @@ func (k *KafkaMessage) IsProcessed() bool {
 
 // **************** Hooks ***********
 
-//KafkaOffsetHook implments HTTPSinkHook amd KafkaSourceHook interface to track kafka offsets
+// KafkaOffsetHook implments HTTPSinkHook amd KafkaSourceHook interface to track kafka offsets
 type KafkaOffsetHook struct {
 	offsetTracker  source.OffsetTracker
 	enableDebugLog bool
 }
 
-//Pre is invoked - before KafaSource pushes message to DMux. This implementation
-//invokes OffsetTracker TrackMe method here, to ensure the Message to track is
-//queued before its execution
+// Pre is invoked - before KafaSource pushes message to DMux. This implementation
+// invokes OffsetTracker TrackMe method here, to ensure the Message to track is
+// queued before its execution
 func (h *KafkaOffsetHook) Pre(data source.KafkaMsg) {
 	// fmt.Println(h.enableDebugLog)
 	// msg := data.(*KafkaMessage)
@@ -151,7 +151,7 @@ func (h *KafkaOffsetHook) Pre(data source.KafkaMsg) {
 	}
 }
 
-//PreHTTPCall is invoked - before HttpSink exection.
+// PreHTTPCall is invoked - before HttpSink exection.
 func (h *KafkaOffsetHook) PreHTTPCall(msg interface{}) {
 	if h.enableDebugLog {
 		data := msg.(sink.HTTPMsg)
@@ -159,9 +159,9 @@ func (h *KafkaOffsetHook) PreHTTPCall(msg interface{}) {
 	}
 }
 
-//PostHTTPCall is invoked - after HttpSink execution. This implementation calls
-//KafkaMessage MarkDone method on the data argument of Post, to mark this
-//message and sucessfuly processed.
+// PostHTTPCall is invoked - after HttpSink execution. This implementation calls
+// KafkaMessage MarkDone method on the data argument of Post, to mark this
+// message and sucessfuly processed.
 func (h *KafkaOffsetHook) PostHTTPCall(msg interface{}, success bool) {
 	data := msg.(source.KafkaMsg)
 	if success {
@@ -173,19 +173,19 @@ func (h *KafkaOffsetHook) PostHTTPCall(msg interface{}, success bool) {
 	}
 }
 
-//GetKafkaHook is a global function that returns instance of KafkaOffsetHook
+// GetKafkaHook is a global function that returns instance of KafkaOffsetHook
 func GetKafkaHook(offsetTracker source.OffsetTracker, enableDebugLog bool) *KafkaOffsetHook {
 	return &KafkaOffsetHook{offsetTracker, enableDebugLog}
 }
 
 // **************** HashLogic ***********
 
-//KafkaMsgHasher implements hasher
-//a hash logic implementation of KafkaMessage.
-//This runs consistenHashin on Key of KafkaKeyedMessage
+// KafkaMsgHasher implements hasher
+// a hash logic implementation of KafkaMessage.
+// This runs consistenHashin on Key of KafkaKeyedMessage
 type KafkaMsgHasher struct{}
 
-//ComputeHash method for KafkaMessage
+// ComputeHash method for KafkaMessage
 func (o *KafkaMsgHasher) ComputeHash(data interface{}) int {
 	val := data.(source.KafkaMsg)
 	h := fnv.New32a()
@@ -193,19 +193,19 @@ func (o *KafkaMsgHasher) ComputeHash(data interface{}) int {
 	return int(h.Sum32())
 }
 
-//GetKafkaMsgHasher is Gloab function to get instance of KafkaMsgHasher
+// GetKafkaMsgHasher is Gloab function to get instance of KafkaMsgHasher
 func GetKafkaMsgHasher() core.Hasher {
 	return new(KafkaMsgHasher)
 }
 
 // **************** HTTPSink Interface implementation ***********
 
-//GetPayload implements HTTPMsg for HttpSink processing
+// GetPayload implements HTTPMsg for HttpSink processing
 func (k *KafkaMessage) GetPayload() []byte {
 	return k.Msg.Value
 }
 
-//GetHeaders implements HTTPMsg for HttpSink processing
+// GetHeaders implements HTTPMsg for HttpSink processing
 func (k *KafkaMessage) GetHeaders(conf sink.HTTPSinkConf) map[string]string {
 	header := make(map[string]string)
 	for _, val := range conf.Headers {
@@ -216,7 +216,7 @@ func (k *KafkaMessage) GetHeaders(conf sink.HTTPSinkConf) map[string]string {
 	return header
 }
 
-//GetURL implements HTTPMsg for HttpSink processing
+// GetURL implements HTTPMsg for HttpSink processing
 func (k *KafkaMessage) GetURL(endpoint string) string {
 	return endpoint + k.GetDebugPath()
 }
@@ -229,7 +229,7 @@ func (k *KafkaMessage) GetDebugPath() string {
 	return k.URL
 }
 
-//BatchURL implements HTTPMsg for HttpSink processing
+// BatchURL implements HTTPMsg for HttpSink processing
 func (k *KafkaMessage) BatchURL(msgs []interface{}, endpoint string, version int) string {
 	var builder strings.Builder
 	topic := ""
@@ -256,7 +256,7 @@ func (k *KafkaMessage) BatchURL(msgs []interface{}, endpoint string, version int
 	}
 }
 
-//BatchPayload implements HTTPMsg for HttpSink processing
+// BatchPayload implements HTTPMsg for HttpSink processing
 func (k *KafkaMessage) BatchPayload(msgs []interface{}, version int) []byte {
 	payload := make([][]byte, len(msgs))
 	partition := int(0)
