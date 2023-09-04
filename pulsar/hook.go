@@ -79,6 +79,7 @@ func (t *CursorTracker) run() {
 		for !msg.IsProcessed() {
 			time.Sleep(100 * time.Microsecond)
 		}
+
 		t.source.commitCursor(msg)
 	}
 }

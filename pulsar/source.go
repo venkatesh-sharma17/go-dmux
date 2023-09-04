@@ -147,5 +147,6 @@ func (p *PulsarSource) Stop() {
 }
 
 func (p *PulsarSource) commitCursor(data MessageProcessor) {
+	log.Printf("going to ack message " + data.GetRawMsg().Key() + " " + data.GetRawMsg().ID().String())
 	p.consumer.Ack(data.GetRawMsg())
 }
