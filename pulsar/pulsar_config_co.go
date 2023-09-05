@@ -11,4 +11,5 @@ type PulsarConf struct {
 	AuthClientSecret string `json:"auth_client_secret"`
 	AuthIssuerURL    string `json:"auth_issuer_url"`
 	AuthAudience     string `json:"auth_audience"`
+	SubscriptionType string `json:"subscription_type"`
 }

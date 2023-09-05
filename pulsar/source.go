@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	pulsar "github.com/apache/pulsar-client-go/pulsar"
@@ -76,13 +77,21 @@ func (p *PulsarSource) Generate(out chan<- interface{}) {
 	if err != nil {
 		panic(err)
 	}
+	var subsriptionType pulsar.SubscriptionType
+	if strings.EqualFold(p.conf.SubscriptionType, "KeyShared") {
+		subsriptionType = pulsar.KeyShared
+		log.Printf("starting with subscription type keyshared")
+	} else {
+		log.Printf("starting with subscription type failover")
+		subsriptionType = pulsar.Failover
+	}
 
 	// Open channel for consumer
 	channel := make(chan pulsar.ConsumerMessage, 100)
 	options := pulsar.ConsumerOptions{
 		Topic:            p.conf.Topic,
 		SubscriptionName: p.conf.SubscriptionName,
-		Type:             pulsar.Failover,
+		Type:             subsriptionType,
 	}
 	options.MessageChannel = channel
 	consumer, err := client.Subscribe(options)
