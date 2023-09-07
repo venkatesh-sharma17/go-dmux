@@ -48,6 +48,10 @@ type Sideline struct {
 	SidelineMeta          interface{} `json:"sidelineMeta"`
 }
 
+type OptionalParamsForDMUXStart struct {
+	EnableDebugLog bool
+}
+
 // ControlMsg is the struct passed to Dmux control Channel to enable it
 // perform Admin operations such as Resize
 type ControlMsg struct {
@@ -167,8 +171,8 @@ func GetDmux(conf DmuxConf, d Distributor) *Dmux {
 }*/
 
 // Connect method holds Dmux logic used to Connect Source to Sink With Sideline
-func (d *Dmux) ConnectWithSideline(source Source, sink Sink, sidelineImpl sideline_module.CheckMessageSideline, enableDebugLog bool) {
-	go d.runWithSideline(source, sink, sidelineImpl, enableDebugLog)
+func (d *Dmux) ConnectWithSideline(source Source, sink Sink, sidelineImpl sideline_module.CheckMessageSideline, optionalParams OptionalParamsForDMUXStart) {
+	go d.runWithSideline(source, sink, sidelineImpl, optionalParams)
 }
 
 // Await method added to enable testing when using bounded source
@@ -220,7 +224,7 @@ func getStopMsg() ControlMsg {
 	return c
 }
 
-func (d *Dmux) runWithSideline(source Source, sink Sink, sidelineImpl sideline_module.CheckMessageSideline, enableDebugLog bool) {
+func (d *Dmux) runWithSideline(source Source, sink Sink, sidelineImpl sideline_module.CheckMessageSideline, optionalParams OptionalParamsForDMUXStart) {
 
 	ch, wg := setupWithSideline(d.size, d.sinkQSize, d.batchSize, sink, source, d.version, d.sideline, sidelineImpl)
 	in := make(chan interface{}, d.sourceQSize)
@@ -233,7 +237,7 @@ func (d *Dmux) runWithSideline(source Source, sink Sink, sidelineImpl sideline_m
 		case data := <-in:
 			i := d.distribute.Distribute(data, len(ch))
 			// log.Printf("writing to channel %d len %d", i, len(ch[i]))
-			if enableDebugLog {
+			if optionalParams.EnableDebugLog {
 				log.Printf("writing to channel %d len %d", i, len(ch[i]))
 			}
 			ch[i] <- data

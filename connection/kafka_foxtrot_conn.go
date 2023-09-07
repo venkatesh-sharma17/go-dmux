@@ -61,7 +61,8 @@ func (c *KafkaFoxtrotConn) Run() {
 	d := core.GetDistribution(conf.Dmux.DistributorType, h)
 
 	dmux := core.GetDmux(conf.Dmux, d)
-	dmux.ConnectWithSideline(src, sk, nil, c.EnableDebugLog)
+	var optionalParams core.OptionalParamsForDMUXStart = core.OptionalParamsForDMUXStart{c.EnableDebugLog}
+	dmux.ConnectWithSideline(src, sk, nil, optionalParams)
 	dmux.Join()
 }
 

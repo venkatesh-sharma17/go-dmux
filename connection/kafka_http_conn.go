@@ -66,10 +66,11 @@ func (c *KafkaHTTPConn) Run() {
 	d := core.GetDistribution(conf.Dmux.DistributorType, h)
 
 	dmux := core.GetDmux(conf.Dmux, d)
+	var optionalParams core.OptionalParamsForDMUXStart = core.OptionalParamsForDMUXStart{c.EnableDebugLog}
 	if c.SidelineImpl != nil {
-		dmux.ConnectWithSideline(src, sk, c.SidelineImpl.(sideline_models.CheckMessageSideline), c.EnableDebugLog)
+		dmux.ConnectWithSideline(src, sk, c.SidelineImpl.(sideline_models.CheckMessageSideline), optionalParams)
 	} else {
-		dmux.ConnectWithSideline(src, sk, nil, c.EnableDebugLog)
+		dmux.ConnectWithSideline(src, sk, nil, optionalParams)
 	}
 	dmux.Join()
 }
