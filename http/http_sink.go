@@ -169,7 +169,6 @@ func (h *HTTPSink) Consume(msg interface{}, retries int, sidelineResponseCodes [
 func (h *HTTPSink) retryPre(msg interface{}, url string) {
 	for {
 		status := h.pre(h.hook, msg, url)
-		log.Print("url is " + url + "  status is " + strconv.FormatBool(status))
 
 		if status {
 			break

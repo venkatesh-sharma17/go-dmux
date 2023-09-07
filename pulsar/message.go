@@ -10,14 +10,13 @@ import (
 	pulsar "github.com/apache/pulsar-client-go/pulsar"
 )
 
-// Message is a container of message and it's state
+// Message is a container of message and it's state and implements HTTPMessage
 type Message struct {
 	Msg       *pulsar.ConsumerMessage
 	Processed bool
 	Sidelined bool
 }
 
-// GetPayload implements HTTPMsg interface
 func (m *Message) GetPayload() []byte {
 	return m.Msg.Payload()
 }

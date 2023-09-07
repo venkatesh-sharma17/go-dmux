@@ -56,7 +56,6 @@ func (p *PulsarSource) Generate(out chan<- interface{}) {
 		"issuer_url":    p.conf.AuthIssuerURL,
 	}
 	privateKey, _ := json.Marshal(props)
-	fmt.Println("prepared pulsar privateKey", privateKey)
 
 	// Build authentication
 	auth := pulsar.NewAuthenticationOAuth2(map[string]string{
@@ -66,7 +65,7 @@ func (p *PulsarSource) Generate(out chan<- interface{}) {
 		"privateKey": fmt.Sprintf("data://%s", string(privateKey)),
 		"clientId":   p.conf.AuthClientId,
 	})
-	fmt.Println("prepared pulsar oauth2")
+	log.Println("prepared pulsar oauth2")
 
 	// Authenticate client
 	client, err := pulsar.NewClient(pulsar.ClientOptions{

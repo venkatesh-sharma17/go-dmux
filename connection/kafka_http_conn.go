@@ -66,7 +66,7 @@ func (c *KafkaHTTPConn) Run() {
 	d := core.GetDistribution(conf.Dmux.DistributorType, h)
 
 	dmux := core.GetDmux(conf.Dmux, d)
-	var optionalParams core.OptionalParamsForDMUXStart = core.OptionalParamsForDMUXStart{c.EnableDebugLog}
+	var optionalParams core.DmuxOptionalParams = core.DmuxOptionalParams{c.EnableDebugLog}
 	if c.SidelineImpl != nil {
 		dmux.ConnectWithSideline(src, sk, c.SidelineImpl.(sideline_models.CheckMessageSideline), optionalParams)
 	} else {

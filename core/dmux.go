@@ -48,7 +48,7 @@ type Sideline struct {
 	SidelineMeta          interface{} `json:"sidelineMeta"`
 }
 
-type OptionalParamsForDMUXStart struct {
+type DmuxOptionalParams struct {
 	EnableDebugLog bool
 }
 
@@ -171,7 +171,7 @@ func GetDmux(conf DmuxConf, d Distributor) *Dmux {
 }*/
 
 // Connect method holds Dmux logic used to Connect Source to Sink With Sideline
-func (d *Dmux) ConnectWithSideline(source Source, sink Sink, sidelineImpl sideline_module.CheckMessageSideline, optionalParams OptionalParamsForDMUXStart) {
+func (d *Dmux) ConnectWithSideline(source Source, sink Sink, sidelineImpl sideline_module.CheckMessageSideline, optionalParams DmuxOptionalParams) {
 	go d.runWithSideline(source, sink, sidelineImpl, optionalParams)
 }
 
@@ -224,7 +224,7 @@ func getStopMsg() ControlMsg {
 	return c
 }
 
-func (d *Dmux) runWithSideline(source Source, sink Sink, sidelineImpl sideline_module.CheckMessageSideline, optionalParams OptionalParamsForDMUXStart) {
+func (d *Dmux) runWithSideline(source Source, sink Sink, sidelineImpl sideline_module.CheckMessageSideline, optionalParams DmuxOptionalParams) {
 
 	ch, wg := setupWithSideline(d.size, d.sinkQSize, d.batchSize, sink, source, d.version, d.sideline, sidelineImpl)
 	in := make(chan interface{}, d.sourceQSize)
