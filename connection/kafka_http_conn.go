@@ -148,7 +148,7 @@ func (h *KafkaOffsetHook) Pre(data source.KafkaMsg) {
 	h.offsetTracker.TrackMe(data)
 	if h.enableDebugLog {
 		msg := data.(sink.HTTPMsg)
-		log.Printf("%s after kafka source", msg.GetDebugPath())
+		log.Printf("%s after kafka source \n", msg.GetDebugPath())
 	}
 }
 
@@ -156,7 +156,7 @@ func (h *KafkaOffsetHook) Pre(data source.KafkaMsg) {
 func (h *KafkaOffsetHook) PreHTTPCall(msg interface{}) {
 	if h.enableDebugLog {
 		data := msg.(sink.HTTPMsg)
-		log.Printf("%s before http sink", data.GetDebugPath())
+		log.Printf("%s before http sink \n", data.GetDebugPath())
 	}
 }
 
@@ -170,7 +170,7 @@ func (h *KafkaOffsetHook) PostHTTPCall(msg interface{}, success bool) {
 	}
 	if h.enableDebugLog {
 		val := msg.(sink.HTTPMsg)
-		log.Printf("%s after http sink, status = %t", val.GetDebugPath(), success)
+		log.Printf("%s after http sink, status = %t \n", val.GetDebugPath(), success)
 	}
 }
 

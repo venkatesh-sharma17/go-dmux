@@ -33,7 +33,7 @@ func (h *CursorHook) Pre(p MessageProcessor) {
 
 func (t *CursorTracker) TrackMe(msg MessageProcessor) {
 	if len(t.ch) == t.size {
-		log.Printf("warning: pending_acks threshold %d reached, please increase pending_acks size", t.size)
+		log.Printf("warning: pending_acks threshold %d reached, please increase pending_acks size \n", t.size)
 	}
 	t.ch <- msg
 }
@@ -42,7 +42,7 @@ func (t *CursorTracker) TrackMe(msg MessageProcessor) {
 func (h *CursorHook) PreHTTPCall(msg interface{}) {
 	if h.enableDebugLog {
 		data := msg.(sink.HTTPMsg)
-		log.Printf("%s before http sink", data.GetDebugPath())
+		log.Printf("%s before http sink \n", data.GetDebugPath())
 	}
 }
 
@@ -56,7 +56,7 @@ func (h *CursorHook) PostHTTPCall(msg interface{}, success bool) {
 	}
 	if h.enableDebugLog {
 		data := msg.(sink.HTTPMsg)
-		log.Printf("%s after http sink, status = %t", data.GetDebugPath(), success)
+		log.Printf("%s after http sink, status = %t \n", data.GetDebugPath(), success)
 	}
 }
 

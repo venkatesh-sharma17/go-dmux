@@ -238,7 +238,7 @@ func (d *Dmux) runWithSideline(source Source, sink Sink, sidelineImpl sideline_m
 			i := d.distribute.Distribute(data, len(ch))
 			// log.Printf("writing to channel %d len %d", i, len(ch[i]))
 			if optionalParams.EnableDebugLog {
-				log.Printf("writing to channel %d len %d", i, len(ch[i]))
+				log.Printf("writing to channel %d len %d \n", i, len(ch[i]))
 			}
 			ch[i] <- data
 		case ctrl := <-d.control:
@@ -280,10 +280,10 @@ func shutdown(ch []chan interface{}, wg *sync.WaitGroup) {
 func setupWithSideline(size, qsize, batchSize int, sink Sink, source Source, version int, sideline Sideline, sidelineImpl sideline_module.CheckMessageSideline) ([]chan interface{}, *sync.WaitGroup) {
 	if version == 1 && batchSize == 1 {
 		if sidelineImpl != nil {
-			log.Printf("Calling simpleSetupWithSideline")
+			log.Printf("Calling simpleSetupWithSideline \n")
 			return simpleSetupWithSideline(size, qsize, sink, source, sideline, sidelineImpl)
 		} else {
-			log.Printf("Calling simpleSetup")
+			log.Printf("Calling simpleSetup \n")
 			return simpleSetup(size, qsize, sink)
 		}
 	} else {
@@ -381,7 +381,7 @@ func sinkConsume(sink Sink, sinkChannel []chan ChannelObject, index int, sidelin
 	expBackOff := backoff.NewExponentialBackOff()
 	//expBackOff.MaxElapsedTime = math.MaxInt32 * time.Minute
 	for channelObject := range sinkChannel[index] {
-		log.Printf("Inside Sink channel ")
+		log.Printf("Inside Sink channel \n")
 		retryError := backoff.Retry(func() error {
 			consumeError := sk.Consume(channelObject.Msg, sideline.Retries, sideline.SidelineResponseCodes)
 			if consumeError == nil {
@@ -415,7 +415,7 @@ func mainChannelConsumption(ch []chan interface{}, index int, source Source, sid
 		expBackOff := backoff.NewExponentialBackOff()
 		//expBackOff.MaxElapsedTime = math.MaxInt32 * time.Minute
 		retryError := backoff.Retry(func() error {
-			log.Printf("Checking if the message is already sidelined %d, %d from channel", partition, offset)
+			log.Printf("Checking if the message is already sidelined %d, %d from channel \n", partition, offset)
 			checkSidelineMessage := sideline_module.SidelineMessage{
 				GroupId:           string(key),
 				Partition:         partition,
@@ -428,24 +428,24 @@ func mainChannelConsumption(ch []chan interface{}, index int, source Source, sid
 			}
 			checkSidelineMessageBytes, checkSidelineMessageErr := json.Marshal(checkSidelineMessage)
 			if checkSidelineMessageErr != nil {
-				log.Printf("error in serde of checkSidelineMessage " + checkSidelineMessageErr.Error())
+				log.Printf("error in serde of checkSidelineMessage " + checkSidelineMessageErr.Error() + "\n")
 				return errors.New("error in serde of checkSidelineMessage " + checkSidelineMessageErr.Error())
 			}
 			checkBytes, checkErr := sidelineImpl.CheckMessageSideline(checkSidelineMessageBytes)
 			err := json.Unmarshal(checkBytes, &check)
 			if err != nil {
-				log.Printf("error in serde of CheckMessageSidelineResponse " + err.Error())
+				log.Printf("error in serde of CheckMessageSidelineResponse \n" + err.Error())
 				return errors.New("error in serde of CheckMessageSidelineResponse " + err.Error())
 			}
 			if checkErr != nil {
-				log.Printf("Error in checking if message is sidelined " + checkErr.Error())
+				log.Printf("Error in checking if message is sidelined \n" + checkErr.Error())
 				return errors.New("Error in checking if message is sidelined " + checkErr.Error())
 			}
-			log.Printf("Message if already sidelined %t %d %d", check.MessagePresentInSideline, partition, offset)
+			log.Printf("Message if already sidelined %t %d %d \n", check.MessagePresentInSideline, partition, offset)
 			if check.MessagePresentInSideline {
 				return nil
 			}
-			log.Printf("SidelineMessage %t %d %d", check.SidelineMessage, partition, offset)
+			log.Printf("SidelineMessage %t %d %d \n", check.SidelineMessage, partition, offset)
 			if check.SidelineMessage {
 				sendToSidelineChannel := ChannelObject{
 					Msg:      msg,
@@ -480,7 +480,7 @@ func pushToSideline(sidelineChannel []chan ChannelObject, index int, source Sour
 				key := source.GetKey(channelObject.Msg)
 				partition := source.GetPartition(channelObject.Msg)
 				offset := source.GetOffset(channelObject.Msg)
-				log.Printf("Inside sideline channel for partition %d offset %d", partition, offset)
+				log.Printf("Inside sideline channel for partition %d offset %d \n", partition, offset)
 				kafkaSidelineMessage := sideline_module.SidelineMessage{
 					GroupId:           string(key),
 					Partition:         partition,
@@ -496,13 +496,13 @@ func pushToSideline(sidelineChannel []chan ChannelObject, index int, source Sour
 
 				sidelineByteArray, err := json.Marshal(kafkaSidelineMessage)
 				if err != nil {
-					log.Printf("error in serde of kafkaSidelineMessage " + err.Error())
+					log.Printf("error in serde of kafkaSidelineMessage " + err.Error() + "\n")
 					return errors.New("error in serde of kafkaSidelineMessage " + err.Error())
 				}
 				sidelineMessageResponse := sidelineImpl.SidelineMessage(sidelineByteArray)
 				if !sidelineMessageResponse.Success {
 					var check sideline_module.CheckMessageSidelineResponse
-					log.Printf(sidelineMessageResponse.ErrorMessage)
+					log.Printf(sidelineMessageResponse.ErrorMessage + " \n")
 					if sidelineMessageResponse.ConcurrentModificationError != nil {
 						checkSidelineMessage := sideline_module.SidelineMessage{
 							GroupId:           string(key),
@@ -516,20 +516,20 @@ func pushToSideline(sidelineChannel []chan ChannelObject, index int, source Sour
 						}
 						checkSidelineMessageBytes, checkSidelineMessageErr := json.Marshal(checkSidelineMessage)
 						if checkSidelineMessageErr != nil {
-							log.Printf("error in serde of checkSidelineMessage")
-							return errors.New("error in serde of checkSidelineMessage")
+							log.Printf("error in serde of checkSidelineMessage \n")
+							return errors.New("error in serde of checkSidelineMessage \n")
 						}
 						checkBytes, checkErr := sidelineImpl.(sideline_module.CheckMessageSideline).
 							CheckMessageSideline(checkSidelineMessageBytes)
 						err := json.Unmarshal(checkBytes, &check)
 						if err != nil {
-							log.Printf("error in serde of CheckMessageSidelineResponse")
-							return errors.New("error in serde of CheckMessageSidelineResponse")
+							log.Printf("error in serde of CheckMessageSidelineResponse \n")
+							return errors.New("error in serde of CheckMessageSidelineResponse \n")
 
 						}
 						if checkErr != nil {
-							log.Printf("Error in checking if message is sidelined " + checkErr.Error())
-							return errors.New("Error in checking if message is sidelined " + checkErr.Error())
+							log.Printf("Error in checking if message is sidelined " + checkErr.Error() + "\n")
+							return errors.New("Error in checking if message is sidelined " + checkErr.Error() + "\n")
 						}
 						channelObject.Version = check.Version
 						return errors.New("Retrying ")
@@ -550,7 +550,7 @@ func simpleSetupWithSideline(size, qsize int, sink Sink, source Source, sideline
 	ch := make([]chan interface{}, size)
 	sidelineChannel := make([]chan ChannelObject, size)
 	sinkChannel := make([]chan ChannelObject, size)
-	log.Printf("Inside simpleSetupWithSideline")
+	log.Printf("Inside simpleSetupWithSideline \n")
 	for i := 0; i < size; i++ {
 		sinkChannel[i] = make(chan ChannelObject, qsize)
 		go sinkConsume(sink, sinkChannel, i, sideline, sidelineChannel)

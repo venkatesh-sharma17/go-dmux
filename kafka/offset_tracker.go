@@ -5,31 +5,31 @@ import (
 	"time"
 )
 
-//OffsetTracker is interface which defines methods to track Messages which
-//have been queued for processing
+// OffsetTracker is interface which defines methods to track Messages which
+// have been queued for processing
 type OffsetTracker interface {
 	TrackMe(kmsg KafkaMsg)
 }
 
-//KafkaOffsetTracker is implementation of OffsetTracker to track offsets for
-//KafkaSource, KafkaMessage
+// KafkaOffsetTracker is implementation of OffsetTracker to track offsets for
+// KafkaSource, KafkaMessage
 type KafkaOffsetTracker struct {
 	ch     chan KafkaMsg
 	source *KafkaSource
 	size   int
 }
 
-//TrackMe method ensures messages to track are enqued for tracking
+// TrackMe method ensures messages to track are enqued for tracking
 func (k *KafkaOffsetTracker) TrackMe(kmsg KafkaMsg) {
 	if len(k.ch) == k.size {
-		log.Printf("warning: pending_acks threshold %d reached, please increase pending_acks size", k.size)
+		log.Printf("warning: pending_acks threshold %d reached, please increase pending_acks size \n", k.size)
 	}
 
 	k.source.offMonitor.IngestSrcSkMetric("source_offset"+"."+k.source.conf.ConsumerGroupName, kmsg.GetRawMsg())
 	k.ch <- kmsg
 }
 
-//GetKafkaOffsetTracker is Global function to get instance of KafkaOffsetTracker
+// GetKafkaOffsetTracker is Global function to get instance of KafkaOffsetTracker
 func GetKafkaOffsetTracker(size int, source *KafkaSource) OffsetTracker {
 	k := &KafkaOffsetTracker{
 		ch:     make(chan KafkaMsg, size),

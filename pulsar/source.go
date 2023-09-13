@@ -79,9 +79,9 @@ func (p *PulsarSource) Generate(out chan<- interface{}) {
 	var subsriptionType pulsar.SubscriptionType
 	if strings.EqualFold(p.conf.SubscriptionType, "KeyShared") {
 		subsriptionType = pulsar.KeyShared
-		log.Printf("starting with subscription type keyshared")
+		log.Printf("starting with subscription type keyshared \n")
 	} else {
-		log.Printf("starting with subscription type failover")
+		log.Printf("starting with subscription type failover \n")
 		subsriptionType = pulsar.Failover
 	}
 
@@ -155,6 +155,6 @@ func (p *PulsarSource) Stop() {
 }
 
 func (p *PulsarSource) commitCursor(data MessageProcessor) {
-	log.Printf("going to ack message " + data.GetRawMsg().Key() + " " + data.GetRawMsg().ID().String())
+	log.Printf("going to ack message " + data.GetRawMsg().Key() + " " + data.GetRawMsg().ID().String() + "\n")
 	p.consumer.Ack(data.GetRawMsg())
 }

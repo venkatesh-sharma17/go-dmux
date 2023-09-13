@@ -208,7 +208,7 @@ func (h *HTTPSink) retryExecute(method, url string, headers map[string]string,
 				return outcome, errors.New(core.SidelineMessage)
 			}
 		}
-		log.Printf("retry in execute %s \t %s ", method, url)
+		log.Printf("retry in execute %s \t %s \n", method, url)
 		time.Sleep(h.conf.RetryInterval.Duration)
 	}
 
@@ -218,7 +218,7 @@ func (h *HTTPSink) pre(hook HTTPSinkHook, msg interface{}, url string) bool {
 	// PreProcess
 	defer func() {
 		if r := recover(); r != nil {
-			log.Printf("failed in httpsink pre hook %s %v", url, r)
+			log.Printf("failed in httpsink pre hook %s %v \n", url, r)
 		}
 	}()
 
@@ -232,7 +232,7 @@ func (h *HTTPSink) post(hook HTTPSinkHook, msg interface{}, status bool, url str
 	// PostPorcessing
 	defer func() {
 		if r := recover(); r != nil {
-			log.Printf("failed in httpsink post hook %s %v", url, r)
+			log.Printf("failed in httpsink post hook %s %v \n", url, r)
 		}
 	}()
 

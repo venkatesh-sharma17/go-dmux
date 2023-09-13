@@ -35,7 +35,7 @@ func unsideline(w http.ResponseWriter, r *http.Request) {
 	}
 	rows, err := unsidelineImpl.UnsidelineByKey(request)
 	if err != nil {
-		log.Printf("Received error while executing plugin")
+		log.Printf("Received error while executing plugin \n")
 		w.WriteHeader(500)
 		w.Write([]byte(err.Error()))
 		w.Header().Set("Content-Type", "application/json")
