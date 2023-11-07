@@ -4,10 +4,13 @@ import (
 	co "github.com/flipkart-incubator/go-dmux/config"
 	"github.com/flipkart-incubator/go-dmux/metrics"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/flipkart-incubator/go-dmux/logging"
 )
+
+import _ "net/http/pprof"
 
 //
 
@@ -22,6 +25,10 @@ func main() {
 	if sz == 1 {
 		path = args[0]
 	}
+
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 
 	dconf := co.DMuxConfigSetting{
 		FilePath: path,
