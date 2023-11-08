@@ -25,7 +25,7 @@ func main() {
 	if sz == 1 {
 		path = args[0]
 	}
-
+	log.Println("preparing go routines for pprof")
 	go func() {
 		log.Println("starting web server for pprof")
 		log.Println(http.ListenAndServe("localhost:6060", nil))
