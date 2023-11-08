@@ -1,11 +1,10 @@
 package core
 
 import (
-	"fmt"
 	"hash/fnv"
 )
 
-//MockSource and MockSink used for testing
+// MockSource and MockSink used for testing
 type MockData struct {
 	key     string
 	version int
@@ -42,10 +41,10 @@ func (m *MockSource) Generate(ch chan<- interface{}) {
 	count := 0
 	for count < 10 {
 		for key := range testData {
-			// fmt.Println(m.status)
+			// log.println(m.status)
 			val := testData[key]
 			if m.status != 1 {
-				fmt.Println("Break From Generate")
+				log.println("Break From Generate")
 				return
 			}
 			th := val[0]
@@ -61,7 +60,7 @@ func (m *MockSource) Generate(ch chan<- interface{}) {
 	}
 	// for _, data := range m.sourceData {
 	// 	if m.status != 1 {
-	// 		fmt.Println("Breaking")
+	// 		log.println("Breaking")
 	// 		break
 	// 	}
 	// 	ch <- data
@@ -70,7 +69,7 @@ func (m *MockSource) Generate(ch chan<- interface{}) {
 
 func (m *MockSource) Stop() {
 	m.status = 2
-	fmt.Println(m.status)
+	log.println(m.status)
 }
 
 type MockSink struct {
@@ -97,7 +96,7 @@ func (m *MockSink) BatchConsume(msgs []interface{}, version int) {
 	}
 }
 
-//Method added for testing
+// Method added for testing
 func (m *MockSink) MergeAndGetOutput() map[string]MockData {
 	output := make(map[string]MockData)
 	for _, s := range m.sinks {
@@ -119,7 +118,7 @@ func (m *MockDataHasher) ComputeHash(data interface{}) int {
 
 /*
 func TestConsistenHashDmuxHappyCase(t *testing.T) {
-	fmt.Println("running test TestConsistenHashDmuxHappyCase")
+	log.println("running test TestConsistenHashDmuxHappyCase")
 	hasher := new(MockDataHasher)
 	d := GetHashDistribution(hasher)
 	size := 4

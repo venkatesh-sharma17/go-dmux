@@ -1,7 +1,6 @@
 package kafka
 
 import (
-	"fmt"
 	"hash/fnv"
 	"testing"
 
@@ -17,7 +16,7 @@ type ConsoleSink struct {
 
 func (c *ConsoleSink) Consume(msg interface{}) {
 	data := msg.(KafkaMsg)
-	fmt.Println(string(data.GetRawMsg().Key))
+	log.println(string(data.GetRawMsg().Key))
 }
 
 func (c *ConsoleSink) BatchConsume(msgs []interface{}, version int) {
@@ -32,12 +31,12 @@ func (c *ConsoleSink) Clone() core.Sink {
 
 // **************** HashLogic ***********
 
-//KafkaMsgHasher implements hasher
-//a hash logic implementation of KafkaMessage.
-//This runs consistenHashin on Key of KafkaKeyedMessage
+// KafkaMsgHasher implements hasher
+// a hash logic implementation of KafkaMessage.
+// This runs consistenHashin on Key of KafkaKeyedMessage
 type KafkaMsgHasher struct{}
 
-//ComputeHash method for KafkaMessage
+// ComputeHash method for KafkaMessage
 func (o *KafkaMsgHasher) ComputeHash(data interface{}) int {
 	val := data.(KafkaMsg)
 	h := fnv.New32a()
@@ -45,7 +44,7 @@ func (o *KafkaMsgHasher) ComputeHash(data interface{}) int {
 	return int(h.Sum32())
 }
 
-//GetKafkaMsgHasher is Gloab function to get instance of KafkaMsgHasher
+// GetKafkaMsgHasher is Gloab function to get instance of KafkaMsgHasher
 func GetKafkaMsgHasher() core.Hasher {
 	return new(KafkaMsgHasher)
 }
@@ -79,7 +78,7 @@ func (k *KafkaMessage) IsProcessed() bool {
 }
 
 func TestKafkaSource(t *testing.T) {
-	fmt.Println("running test TestKafkaSource")
+	log.println("running test TestKafkaSource")
 	hasher := new(KafkaMsgHasher)
 	d := core.GetHashDistribution(hasher)
 
@@ -100,7 +99,7 @@ func TestKafkaSource(t *testing.T) {
 	}
 	dmux := core.GetDmux(dconf, d)
 	// dmux.Connect(source, sink)
-	fmt.Printf("source: %v", source)
+	log.printf("source: %v", source)
 	assert.NotNil(t, source, "Source should not be Nil")
 	assert.NotNil(t, sink, "Sink should not be Nil")
 	assert.NotNil(t, dmux, "Dmux should not be Nil")

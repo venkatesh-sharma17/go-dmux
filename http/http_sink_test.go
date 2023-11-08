@@ -2,7 +2,6 @@ package http
 
 import (
 	"encoding/json"
-	"fmt"
 	"hash/fnv"
 	"io/ioutil"
 	"log"
@@ -56,7 +55,7 @@ func (p *PrintHook) PreHTTPCall(msg interface{}) {
 	// do nothing
 }
 func (p *PrintHook) PostHTTPCall(msg interface{}, success bool) {
-	fmt.Println(msg, success)
+	log.println(msg, success)
 }
 
 type FileSource struct {
@@ -102,7 +101,7 @@ func parseConf(path string) HTTPSinkConf {
 }
 
 // func TestHTTPSink(t *testing.T) {
-// 	fmt.Println("running test TestHTTPSink")
+// 	log.println("running test TestHTTPSink")
 // 	hook := new(PrintHook)
 // 	conf := parseConf("sink_test.json")
 // 	sink := GetHTTPSink(10, conf)
@@ -112,7 +111,7 @@ func parseConf(path string) HTTPSinkConf {
 // }
 
 // func TestHTTPSinkWithDMux(t *testing.T) {
-// 	fmt.Println("running test TestHTTPSinkWithDMux")
+// 	log.println("running test TestHTTPSinkWithDMux")
 // 	hasher := new(OrderMsgHasher)
 // 	d := core.GetHashDistribution(hasher)
 // 	dconf := core.DmuxConf{

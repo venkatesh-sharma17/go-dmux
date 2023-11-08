@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"hash/fnv"
 	"testing"
 )
@@ -16,7 +15,7 @@ func (s StrData) ComputeHash(data interface{}) int {
 }
 
 func TestStringDistribution(t *testing.T) {
-	fmt.Println("running test TestStringDistribution")
+	log.println("running test TestStringDistribution")
 	data := [5]StrData{"First", "Second", "Third", "Fourth", "Fifth"}
 	hashIndex := [5]int{7, 9, 0, 9, 4}
 	size := 10
@@ -44,7 +43,7 @@ func GetMsg(key string) MsgData {
 	return MsgData{key}
 }
 func TestMsgDistribution(t *testing.T) {
-	fmt.Println("running test TestMsgDistribution")
+	log.println("running test TestMsgDistribution")
 	data := [5]MsgData{
 		GetMsg("First"),
 		GetMsg("Second"),

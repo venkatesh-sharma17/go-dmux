@@ -3,7 +3,6 @@ package http
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -115,7 +114,7 @@ func (h *HTTPSink) Clone() core.Sink {
 
 // BatchConsume is implementation of Sink interface Consume.
 func (h *HTTPSink) BatchConsume(msgs []interface{}, version int) {
-	// fmt.Println(msgs)
+	// log.println(msgs)
 	batchHelper := msgs[0].(HTTPMsg) // empty refrence to help call static methods
 	// data := msg.(HTTPMsg)
 
@@ -247,7 +246,7 @@ func (h *HTTPSink) execute(method, url string, headers map[string]string,
 	//Never fail always recover
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Printf("recovered in execute %s %v", url, r)
+			log.printf("recovered in execute %s %v", url, r)
 		}
 	}()
 
