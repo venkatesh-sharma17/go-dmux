@@ -27,6 +27,7 @@ func main() {
 	}
 
 	go func() {
+		log.Println("starting web server for pprof")
 		log.Println(http.ListenAndServe("localhost:6060", nil))
 	}()
 
