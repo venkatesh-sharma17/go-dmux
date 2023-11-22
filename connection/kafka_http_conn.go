@@ -44,7 +44,7 @@ func (c *KafkaHTTPConn) getConfiguration() *KafkaHTTPConnConfig {
 // Run method to start this Connection from source to sink
 func (c *KafkaHTTPConn) Run() {
 	conf := c.getConfiguration()
-	log.println("starting go-dmux with conf", conf)
+	log.Println("starting go-dmux with conf", conf)
 	if c.EnableDebugLog {
 		// enable sarama logs if booted with debug logs
 		log.Println("enabling sarama logs")
@@ -142,7 +142,7 @@ type KafkaOffsetHook struct {
 // invokes OffsetTracker TrackMe method here, to ensure the Message to track is
 // queued before its execution
 func (h *KafkaOffsetHook) Pre(data source.KafkaMsg) {
-	// log.println(h.enableDebugLog)
+	// log.Println(h.enableDebugLog)
 	// msg := data.(*KafkaMessage)
 	h.offsetTracker.TrackMe(data)
 	if h.enableDebugLog {

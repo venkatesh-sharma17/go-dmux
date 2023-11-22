@@ -26,7 +26,7 @@ public class BatchDecoderTest {
         byte[] payload = Arrays.copyOfRange(data, 0, counter);
         byte[][] output = BatchDecoder.DECODE.decode(payload);
         for (int i = 0; i < output.length; i++) {
-            System.out.println(new String(output[i]));
+            System.out.Println(new String(output[i]));
         }
     }
 }

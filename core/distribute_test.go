@@ -15,7 +15,7 @@ func (s StrData) ComputeHash(data interface{}) int {
 }
 
 func TestStringDistribution(t *testing.T) {
-	log.println("running test TestStringDistribution")
+	log.Println("running test TestStringDistribution")
 	data := [5]StrData{"First", "Second", "Third", "Fourth", "Fifth"}
 	hashIndex := [5]int{7, 9, 0, 9, 4}
 	size := 10
@@ -43,7 +43,7 @@ func GetMsg(key string) MsgData {
 	return MsgData{key}
 }
 func TestMsgDistribution(t *testing.T) {
-	log.println("running test TestMsgDistribution")
+	log.Println("running test TestMsgDistribution")
 	data := [5]MsgData{
 		GetMsg("First"),
 		GetMsg("Second"),

@@ -41,10 +41,10 @@ func (m *MockSource) Generate(ch chan<- interface{}) {
 	count := 0
 	for count < 10 {
 		for key := range testData {
-			// log.println(m.status)
+			// log.Println(m.status)
 			val := testData[key]
 			if m.status != 1 {
-				log.println("Break From Generate")
+				log.Println("Break From Generate")
 				return
 			}
 			th := val[0]
@@ -60,7 +60,7 @@ func (m *MockSource) Generate(ch chan<- interface{}) {
 	}
 	// for _, data := range m.sourceData {
 	// 	if m.status != 1 {
-	// 		log.println("Breaking")
+	// 		log.Println("Breaking")
 	// 		break
 	// 	}
 	// 	ch <- data
@@ -69,7 +69,7 @@ func (m *MockSource) Generate(ch chan<- interface{}) {
 
 func (m *MockSource) Stop() {
 	m.status = 2
-	log.println(m.status)
+	log.Println(m.status)
 }
 
 type MockSink struct {
@@ -118,7 +118,7 @@ func (m *MockDataHasher) ComputeHash(data interface{}) int {
 
 /*
 func TestConsistenHashDmuxHappyCase(t *testing.T) {
-	log.println("running test TestConsistenHashDmuxHappyCase")
+	log.Println("running test TestConsistenHashDmuxHappyCase")
 	hasher := new(MockDataHasher)
 	d := GetHashDistribution(hasher)
 	size := 4

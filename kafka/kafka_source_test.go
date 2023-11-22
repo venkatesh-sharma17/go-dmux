@@ -16,7 +16,7 @@ type ConsoleSink struct {
 
 func (c *ConsoleSink) Consume(msg interface{}) {
 	data := msg.(KafkaMsg)
-	log.println(string(data.GetRawMsg().Key))
+	log.Println(string(data.GetRawMsg().Key))
 }
 
 func (c *ConsoleSink) BatchConsume(msgs []interface{}, version int) {
@@ -78,7 +78,7 @@ func (k *KafkaMessage) IsProcessed() bool {
 }
 
 func TestKafkaSource(t *testing.T) {
-	log.println("running test TestKafkaSource")
+	log.Println("running test TestKafkaSource")
 	hasher := new(KafkaMsgHasher)
 	d := core.GetHashDistribution(hasher)
 
@@ -99,7 +99,7 @@ func TestKafkaSource(t *testing.T) {
 	}
 	dmux := core.GetDmux(dconf, d)
 	// dmux.Connect(source, sink)
-	log.printf("source: %v", source)
+	log.Printf("source: %v", source)
 	assert.NotNil(t, source, "Source should not be Nil")
 	assert.NotNil(t, sink, "Sink should not be Nil")
 	assert.NotNil(t, dmux, "Dmux should not be Nil")

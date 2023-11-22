@@ -5,6 +5,7 @@ import (
 	"github.com/flipkart-incubator/go-dmux/core"
 	sink "github.com/flipkart-incubator/go-dmux/http"
 	source "github.com/flipkart-incubator/go-dmux/pulsar"
+	"log"
 )
 
 // PulsarConnConfig holds config to connect pulsar source to http sink
@@ -32,7 +33,7 @@ func (c *PulsarConn) getConfiguration() *PulsarConnConfig {
 // Run starts connection from source to sink
 func (c *PulsarConn) Run() {
 	conf := c.getConfiguration()
-	log.println("starting go-dmux with conf", conf)
+	log.Println("starting go-dmux with conf", conf)
 
 	src := source.GetPulsarSource(conf.Source)
 	tracker := source.GetCursorTracker(conf.PendingAcks, src)

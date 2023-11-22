@@ -72,7 +72,7 @@ func (p *PulsarSource) Generate(out chan<- interface{}) {
 		URL:            p.conf.Url,
 		Authentication: auth,
 	})
-	log.println("prepared client with authentication")
+	log.Println("prepared client with authentication")
 	if err != nil {
 		panic(err)
 	}
@@ -117,7 +117,7 @@ func (p *PulsarSource) Generate(out chan<- interface{}) {
 			client.Close()
 			panic(er)
 		}
-		log.printf("Done Setting SeekByTime as %v %v\n", seekByTime.String(), updatedTime)
+		log.Printf("Done Setting SeekByTime as %v %v\n", seekByTime.String(), updatedTime)
 	} else if p.conf.ForceRestart {
 		log.Println("Setting force restart as true")
 
