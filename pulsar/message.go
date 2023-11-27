@@ -37,7 +37,8 @@ func (m *Message) GetURL(endpoint string) string {
 	_topic := strings.Split(m.Msg.Topic(), "/")
 	topic := _topic[len(_topic)-1]
 	builder.WriteString("?topic=" + topic)
-	builder.WriteString(fmt.Sprintf("&entryId=%s&ledgerId=%s&batchId=%s",
+	builder.WriteString(fmt.Sprintf("&key=%s&entryId=%s&ledgerId=%s&batchId=%s",
+		m.Msg.Key(),
 		strconv.FormatInt(m.Msg.ID().EntryID(), 10),
 		strconv.FormatInt(m.Msg.ID().LedgerID(), 10),
 		strconv.FormatInt(int64(m.Msg.ID().BatchIdx()), 10)))
